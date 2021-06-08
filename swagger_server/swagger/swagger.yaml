@@ -1,0 +1,929 @@
+openapi: 3.0.3
+info:
+  title: "Subsistema 3: gestión de trabajos de un taller"
+  description: "Asignatura AOS: grupo 1"
+  contact:
+    name: Arquitecturas Orientadas a Servicios
+    url: https://moodle.upm.es/titulaciones/oficiales/mod/assign/view.php?id=1320916
+    email: alberto.romartin@alumnos.upm.es
+  license:
+    name: AOSGrupo1
+    url: https://github.com/miguel-benito-martin/practica1_AOS
+  version: 1.0.0
+servers:
+- url: "{schema}://{server}:{port}/{basePath}"
+  description: Servidor local
+  variables:
+    schema:
+      description: Esquema
+      default: http
+      enum:
+      - http
+      - https
+    server:
+      description: Nombre del servidor
+      default: 127.0.0.1
+    port:
+      description: Número de puerto
+      default: "80"
+    basePath:
+      description: Ruta base
+      default: api/v1
+tags:
+- name: Trabajo
+  description: Trabajos de los usuarios
+paths:
+  /trabajo:
+    get:
+      tags:
+      - Trabajo
+      summary: Obtiene todos los trabajos de mantenimiento que se realizan sobre un
+        vehículo
+      operationId: tget
+      responses:
+        "200":
+          description: Array de trabajos
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+              examples:
+                trabajosExamples:
+                  $ref: '#/components/examples/trabajos'
+        "400":
+          description: "BAD REQUEST: request no procesable"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-400:
+                  $ref: '#/components/examples/response-http-400'
+        "404":
+          description: "NOT FOUND: recurso no disponible"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-404:
+                  $ref: '#/components/examples/response-http-404'
+        "414":
+          description: "REQUEST-URI TOO LONG: la URI es demasiado larga"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-414:
+                  $ref: '#/components/examples/response-http-414'
+      x-openapi-router-controller: swagger_server.controllers.trabajo_controller
+    post:
+      tags:
+      - Trabajo
+      summary: Crea un nuevo trabajo
+      description: Genera un nuevo trabajo de mantenimiento para un determinado vehículo
+      operationId: tpost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body'
+        required: true
+      responses:
+        "201":
+          description: Trabajo creado
+          headers:
+            Location:
+              $ref: '#/components/headers/Location'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trabajo'
+        "400":
+          description: "BAD REQUEST: request no procesable"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-400:
+                  $ref: '#/components/examples/response-http-400'
+        "413":
+          description: "PAYLOAD TOO LARGE: el dato es demasiado grande"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-413:
+                  $ref: '#/components/examples/response-http-413'
+        "414":
+          description: "REQUEST-URI TOO LONG: la URI es demasiado larga"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-414:
+                  $ref: '#/components/examples/response-http-414'
+        "422":
+          description: "UNPROCESSABLE ENTITY: falta algún dato"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-422:
+                  $ref: '#/components/examples/response-http-422'
+      x-openapi-router-controller: swagger_server.controllers.trabajo_controller
+    options:
+      tags:
+      - Trabajo
+      summary: Proporciona la lista de los métodos HTTP soportados
+      description: Devuelve una cabecera `Allow` con la lista de métodos HTTP soportados
+        (separados por comas).
+      operationId: toptions
+      responses:
+        "204":
+          description: cabecera `Allow` &lt;El cuerpo de la respuesta está vacío&gt;
+          headers:
+            Allow:
+              $ref: '#/components/headers/Allow'
+        "405":
+          description: "METHOD NOT ALLOWED: metodo no permitido"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-405:
+                  $ref: '#/components/examples/response-http-405'
+      x-openapi-router-controller: swagger_server.controllers.trabajo_controller
+  /trabajo/findByEstadoTrabajo:
+    get:
+      tags:
+      - Trabajo
+      summary: Buscar trabajos por estado
+      description: Buscar trabajos por su estado actual
+      operationId: estget
+      parameters:
+      - name: estadoTrabajo
+        in: query
+        description: Elegir tipo de trabajo para su búsqueda
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: Creado
+          enum:
+          - Creado
+          - Planificado
+          - Iniciado
+          - Terminado
+      responses:
+        "200":
+          description: Array de trabajos
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+              examples:
+                trabajosExamples:
+                  $ref: '#/components/examples/trabajos'
+        "400":
+          description: "BAD REQUEST: request no procesable"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-400:
+                  $ref: '#/components/examples/response-http-400'
+      x-openapi-router-controller: swagger_server.controllers.trabajo_controller
+  /trabajo/cliente/{idCliente}:
+    get:
+      tags:
+      - Trabajo
+      summary: Buscar trabajos por cliente
+      description: Buscar trabajos por el cliente que lo ha encargado
+      operationId: cget
+      parameters:
+      - name: idCliente
+        in: path
+        description: Id del cliente
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^\d+$
+          type: integer
+      responses:
+        "200":
+          description: Array de trabajos
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+              examples:
+                trabajosExamples:
+                  $ref: '#/components/examples/trabajos'
+        "400":
+          description: "BAD REQUEST: request no procesable"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-400:
+                  $ref: '#/components/examples/response-http-400'
+        "404":
+          description: "NOT FOUND: recurso no disponible"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-404:
+                  $ref: '#/components/examples/response-http-404'
+      x-openapi-router-controller: swagger_server.controllers.trabajo_controller
+  /trabajo/vehiculo/{idVehiculo}:
+    get:
+      tags:
+      - Trabajo
+      summary: Buscar trabajos por identificador vehiculo
+      description: Buscar trabajos por el vehículo del cliente que lo ha encargado
+      operationId: vget
+      parameters:
+      - name: idVehiculo
+        in: path
+        description: Id del vehiculo
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^\d+$
+          type: integer
+      responses:
+        "200":
+          description: Array de trabajos
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+              examples:
+                trabajosExamples:
+                  $ref: '#/components/examples/trabajos'
+        "400":
+          description: "BAD REQUEST: request no procesable"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-400:
+                  $ref: '#/components/examples/response-http-400'
+        "404":
+          description: "NOT FOUND: recurso no disponible"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-404:
+                  $ref: '#/components/examples/response-http-404'
+      x-openapi-router-controller: swagger_server.controllers.trabajo_controller
+  /trabajo/{trabajoId}:
+    get:
+      tags:
+      - Trabajo
+      summary: Buscar un trabajo por su ID
+      description: Devuelve el trabajo especificado por `trabajoId`
+      operationId: idget
+      parameters:
+      - name: trabajoId
+        in: path
+        description: ID del trabajo
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^\d+$
+          type: integer
+      responses:
+        "200":
+          description: Trabajo
+          headers:
+            ETag:
+              $ref: '#/components/headers/ETag'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trabajo'
+              examples:
+                trabajosExamples:
+                  $ref: '#/components/examples/trabajos'
+        "400":
+          description: "BAD REQUEST: request no procesable"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-400:
+                  $ref: '#/components/examples/response-http-400'
+        "404":
+          description: "NOT FOUND: recurso no disponible"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-404:
+                  $ref: '#/components/examples/response-http-404'
+      x-openapi-router-controller: swagger_server.controllers.trabajo_controller
+    put:
+      tags:
+      - Trabajo
+      summary: Modifica un trabajo
+      description: Actualiza los datos de un trabajo por un trabajoId
+      operationId: idput
+      parameters:
+      - name: trabajoId
+        in: path
+        description: ID del trabajo
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^\d+$
+          type: integer
+      - name: If_Match
+        in: header
+        description: ETag del recurso que se desea modificar
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: "[0-9a-f]*"
+          type: string
+      requestBody:
+        $ref: '#/components/requestBodies/trabajoRB'
+      responses:
+        "200":
+          description: "Todo OK: trabajo modificado"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trabajo'
+        "400":
+          description: "BAD REQUEST: request no procesable"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-400:
+                  $ref: '#/components/examples/response-http-400'
+        "404":
+          description: "NOT FOUND: recurso no disponible"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-404:
+                  $ref: '#/components/examples/response-http-404'
+        "412":
+          description: "PRECONDITION FAILED: no se cumple alguna condición previa"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-412:
+                  $ref: '#/components/examples/response-http-412'
+        "413":
+          description: "PAYLOAD TOO LARGE: el dato es demasiado grande"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-413:
+                  $ref: '#/components/examples/response-http-413'
+      x-openapi-router-controller: swagger_server.controllers.trabajo_controller
+    delete:
+      tags:
+      - Trabajo
+      summary: Elimina un trabajo
+      description: Elimina un trabajo identificada por `trabajoId`.
+      operationId: iddelete
+      parameters:
+      - name: trabajoId
+        in: path
+        description: ID del trabajo
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^\d+$
+          type: integer
+      responses:
+        "204":
+          description: Trabajo eliminado &lt;Cuerpo de la respuesta vacío&gt;
+        "400":
+          description: "BAD REQUEST: request no procesable"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-400:
+                  $ref: '#/components/examples/response-http-400'
+        "404":
+          description: "NOT FOUND: recurso no disponible"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HTTP_Problems'
+              examples:
+                response-http-404:
+                  $ref: '#/components/examples/response-http-404'
+      x-openapi-router-controller: swagger_server.controllers.trabajo_controller
+components:
+  schemas:
+    Trabajo:
+      type: object
+      properties:
+        trabajoId:
+          type: integer
+          description: Identicador del trabajo
+          format: int32
+          readOnly: true
+        idVehiculo:
+          type: integer
+          description: ID del vehículo sobre el que se reliza el trabajo
+          format: int32
+          readOnly: true
+        idCliente:
+          type: integer
+          description: ID del cliente propietario del vehículo
+          format: int32
+          readOnly: true
+        nombre:
+          type: string
+          description: Nombre del tipo de trabajo
+        descripcion:
+          type: string
+          description: Descripción del trabajo
+        estadoTrabajo:
+          type: string
+          description: "Posibles estados del trabajo [Creado, Planificado, Iniciado,\
+            \ Terminado]"
+          enum:
+          - Creado
+          - Planificado
+          - Iniciado
+          - Terminado
+        fechaInicio:
+          type: string
+          description: Fecha en la que se inicializa el trabajo
+          format: date-time
+        fechaFin:
+          type: string
+          description: Fecha en la que se finaliza el trabajo
+          format: date-time
+        links:
+          $ref: '#/components/schemas/Trabajo_links'
+      description: Añadir descripción
+      example:
+        trabajoId: 1234
+        idVehiculo: 98765
+        idCliente: 14
+        nombre: Cambio de agua
+        descripcion: Cambio de agua cada 500km
+        estadoTrabajo: Iniciado
+        fechaInicio: 2021-01-30T08:30:00Z
+        links:
+          trabajos:
+            href: /api/v1/trabajo
+            rel: coleccionTrabajos
+          self:
+            href: /api/v1/trabajo/1234
+            rel: creado iniciado planificado terminado
+    HTTP_Problems:
+      type: object
+      properties:
+        type:
+          type: string
+          description: "A URI reference [RFC3986] that identifies the problem type"
+          format: uri
+        title:
+          type: string
+          description: short human-readable summary of the problem type
+        status:
+          type: number
+          description: HTTP status code
+        detail:
+          type: string
+          description: human-readable explanation specific to this occurrence of the
+            problem
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence of
+            the problem.  It may or may not yield further information if dereferenced
+          format: uri
+      description: Problem Details for HTTP APIs
+      externalDocs:
+        url: https://tools.ietf.org/html/rfc7807
+    inline_response_200:
+      type: object
+      properties:
+        trabajos:
+          type: array
+          description: array de trabajos
+          items:
+            $ref: '#/components/schemas/Trabajo'
+      example:
+        trabajos:
+        - trabajoId: 1234
+          idVehiculo: 98765
+          idCliente: 14
+          nombre: Cambio de agua
+          descripcion: Cambio de agua cada 500km
+          estadoTrabajo: Iniciado
+          fechaInicio: 2021-01-30T08:30:00Z
+          links:
+            trabajos:
+              href: /api/v1/trabajo
+              rel: coleccionTrabajos
+            self:
+              href: /api/v1/trabajo/1234
+              rel: creado iniciado planificado terminado
+        - trabajoId: 1234
+          idVehiculo: 98765
+          idCliente: 14
+          nombre: Cambio de agua
+          descripcion: Cambio de agua cada 500km
+          estadoTrabajo: Iniciado
+          fechaInicio: 2021-01-30T08:30:00Z
+          links:
+            trabajos:
+              href: /api/v1/trabajo
+              rel: coleccionTrabajos
+            self:
+              href: /api/v1/trabajo/1234
+              rel: creado iniciado planificado terminado
+    body:
+      required:
+      - descripcion
+      - idCliente
+      - idVehiculo
+      - nombre
+      type: object
+      properties:
+        nombre:
+          type: string
+          description: Nombre del tipo de trabajo
+          format: string
+        descripcion:
+          type: string
+          description: Descripción del trabajo
+          format: string
+        idVehiculo:
+          type: integer
+          description: Identificador del vehículo
+          format: int32
+        idCliente:
+          type: integer
+          description: Identificador del cliente
+          format: int32
+      example:
+        nombre: Cambio de agua
+        descripcion: Cambio de agua cada 500km
+        idVehiculo: 99999
+        idCliente: 11111
+    Trabajo_links_trabajos:
+      type: object
+      properties:
+        href:
+          type: string
+          description: URL del enlace
+          format: url
+          x-faker: internet.url
+        rel:
+          type: string
+          description: Relación del documento enlazado con el actual. Contiene una
+            lista de tipos de enlaces separados por espacio.
+          x-faker: lorem.words
+      description: Enlace de relación
+    Trabajo_links:
+      type: object
+      properties:
+        trabajos:
+          $ref: '#/components/schemas/Trabajo_links_trabajos'
+        self:
+          $ref: '#/components/schemas/Trabajo_links_trabajos'
+      description: Enlaces de relación
+  responses:
+    Response_400:
+      description: "BAD REQUEST: request no procesable"
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/HTTP_Problems'
+          examples:
+            response-http-400:
+              $ref: '#/components/examples/response-http-400'
+    Response_404:
+      description: "NOT FOUND: recurso no disponible"
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/HTTP_Problems'
+          examples:
+            response-http-404:
+              $ref: '#/components/examples/response-http-404'
+    Response_405:
+      description: "METHOD NOT ALLOWED: metodo no permitido"
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/HTTP_Problems'
+          examples:
+            response-http-405:
+              $ref: '#/components/examples/response-http-405'
+    Response_412:
+      description: "PRECONDITION FAILED: no se cumple alguna condición previa"
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/HTTP_Problems'
+          examples:
+            response-http-412:
+              $ref: '#/components/examples/response-http-412'
+    Response_413:
+      description: "PAYLOAD TOO LARGE: el dato es demasiado grande"
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/HTTP_Problems'
+          examples:
+            response-http-413:
+              $ref: '#/components/examples/response-http-413'
+    Response_414:
+      description: "REQUEST-URI TOO LONG: la URI es demasiado larga"
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/HTTP_Problems'
+          examples:
+            response-http-414:
+              $ref: '#/components/examples/response-http-414'
+    Response_422:
+      description: "UNPROCESSABLE ENTITY: falta algún dato"
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/HTTP_Problems'
+          examples:
+            response-http-422:
+              $ref: '#/components/examples/response-http-422'
+  parameters:
+    trabajoId:
+      name: trabajoId
+      in: path
+      description: ID del trabajo
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^\d+$
+        type: integer
+    ifMatchParam:
+      name: If_Match
+      in: header
+      description: ETag del recurso que se desea modificar
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: "[0-9a-f]*"
+        type: string
+    estadoTrabajo:
+      name: estadoTrabajo
+      in: query
+      description: Elegir tipo de trabajo para su búsqueda
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: string
+        default: Creado
+        enum:
+        - Creado
+        - Planificado
+        - Iniciado
+        - Terminado
+    idCliente:
+      name: idCliente
+      in: path
+      description: Id del cliente
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^\d+$
+        type: integer
+    idVehiculo:
+      name: idVehiculo
+      in: path
+      description: Id del vehiculo
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^\d+$
+        type: integer
+  examples:
+    trabajos:
+      value:
+      - trabajoId: 1234
+        idVehiculo: 98765
+        idCliente: 14
+        nombre: Cambio de aceite
+        descripcion: Cambio de aceite cada 5000km
+        estadoTrabajo: Iniciado
+        fechaInicio: 2021-01-30T08:30:00Z
+        links:
+          trabajos:
+            href: /api/v1/trabajo
+            rel: coleccionTrabajos
+          self:
+            href: /api/v1/trabajo/1234
+            rel: creado iniciado planificado terminado
+      - trabajoId: 9876
+        idVehiculo: 12345
+        idCliente: 110
+        nombre: Cambio de motor
+        descripcion: Cambio de motor cada 90000km
+        estadoTrabajo: Planificado
+        fechaInicio: 2021-04-10T08:30:00Z
+        links:
+          trabajos:
+            href: /api/v1/trabajo
+            rel: coleccionTrabajos
+          self:
+            href: /api/v1/trabajo/9876
+            rel: creado iniciado planificado terminado
+      - trabajoId: 6543
+        idVehiculo: 20216
+        idCliente: 98
+        nombre: Junta de culata
+        descripcion: Arreglar junta de culata por sobrecalentamiento del motor
+        estadoTrabajo: Iniciado
+        fechaInicio: 2020-12-20T08:30:00Z
+        links:
+          trabajos:
+            href: /api/v1/trabajo
+            rel: coleccionTrabajos
+          self:
+            href: /api/v1/trabajo/6543
+            rel: creado iniciado planificado terminado
+      - trabajoId: "0258"
+        idVehiculo: 74598
+        idCliente: 84
+        nombre: Recambio embrague
+        descripcion: Embrague desgastado por mal uso
+        estadoTrabajo: Terminado
+        fechaInicio: 2021-01-07T08:30:00Z
+        fechaFin: 2021-01-30T17:30:00Z
+        links:
+          trabajos:
+            href: /api/v1/trabajo
+            rel: coleccionTrabajos
+          self:
+            href: /api/v1/trabajo/0258
+            rel: creado iniciado planificado terminado
+    response-http-400:
+      value:
+        type: https://httpstatuses.com/400
+        title: BAD REQUEST
+        status: 400
+        detail: Request errónea
+        instance: about:blank
+    response-http-404:
+      value:
+        type: https://httpstatuses.com/404
+        title: NOT FOUND
+        status: 404
+        detail: El recurso solicitado no está disponible...
+        instance: about:blank
+    response-http-405:
+      value:
+        type: https://httpstatuses.com/405
+        title: METHOD NOT ALLOWED
+        status: 405
+        detail: El metodo no está permitido
+        instance: about:blank
+    response-http-412:
+      value:
+        type: https://httpstatuses.com/412
+        title: PRECONDITION FAILED
+        status: 412
+        detail: Ha fallado alguna precondición
+        instance: about:blank
+    response-http-413:
+      value:
+        type: https://httpstatuses.com/413
+        title: PAYLOAD TOO LARGE
+        status: 413
+        detail: Tamaño del dato demasiado grande
+        instance: about:blank
+    response-http-414:
+      value:
+        type: https://httpstatuses.com/414
+        title: REQUEST-URI TOO LONG
+        status: 414
+        detail: Tamaño del URI demasiado grande
+        instance: about:blank
+    response-http-422:
+      value:
+        type: https://httpstatuses.com/422
+        title: UNPROCESSABLE ENTITY
+        status: 422
+        detail: Fallo semántico
+        instance: about:blank
+  requestBodies:
+    trabajoRB:
+      description: '`Trabajo` data'
+      content:
+        application/json:
+          schema:
+            required:
+            - descripcion
+            - estadoTrabajo
+            - nombre
+            type: object
+            properties:
+              nombre:
+                type: string
+                description: Nombre del tipo de trabajo
+              descripcion:
+                type: string
+                description: Descripción del trabajo
+              estadoTrabajo:
+                type: string
+                description: "Posibles estados del trabajo [Creado, Planificado, Iniciado,\
+                  \ Terminado]"
+                enum:
+                - Creado
+                - Planificado
+                - Iniciado
+                - Terminado
+            example:
+              nombre: Reparación de frenos
+              descripcion: Reparación del freno derecho
+              estadoTrabajo: Creado
+      required: true
+  headers:
+    ETag:
+      description: Entity Tag (identificador único proporcionado para validación de
+        caché)
+      style: simple
+      explode: false
+      schema:
+        pattern: "[0-9a-f]*"
+        type: string
+        example: 32b64ff851405fdd
+        x-faker: random.uuid
+    Location:
+      description: '`URI` del nuevo recurso'
+      style: simple
+      explode: false
+      schema:
+        type: string
+        format: url
+        x-faker: internet.url
+    Allow:
+      description: Lista de métodos HTTP soportados
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: "GET,POST,DELETE,PUT,OPTIONS"
+
