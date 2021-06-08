@@ -1,12 +1,42 @@
 import connexion
 import six
+import datetime
 
 from swagger_server.models.body import Body  # noqa: E501
 from swagger_server.models.http_problems import HTTPProblems  # noqa: E501
 from swagger_server.models.inline_response200 import InlineResponse200  # noqa: E501
 from swagger_server.models.trabajo import Trabajo  # noqa: E501
 from swagger_server import util
+from flask import make_response
 
+example = [
+    {
+        'trabajoId': 258,
+        'idVehiculo': 74598,
+        'idCliente': 84,
+        'nombre': 'Recambio embrague',
+        'descripcion': 'Embrague desgastado por mal uso',
+        'estadoTrabajo': 'Terminado',
+        'fechaInicio': datetime.date(2021, 1, 7),
+        'fechaFin': datetime.date(2021, 1, 17),
+        'links': [
+            {
+                'trabajos': [
+                    {
+                    "href": "/api/v1/trabajo",
+                    "rel": "coleccionTrabajos"
+                    }
+                ],
+                'self': [
+                    {
+                    "href": "/api/v1/trabajo/258",
+                    "rel": "creado iniciado planificado terminado"
+                    }
+                ]
+            }
+        ]
+    }
+]
 
 def cget(id_cliente):  # noqa: E501
     """Buscar trabajos por cliente
@@ -87,7 +117,7 @@ def tget():  # noqa: E501
 
     :rtype: InlineResponse200
     """
-    return 'do some magic!'
+    return example
 
 
 def toptions():  # noqa: E501
